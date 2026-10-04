@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Atlas Ledger Pro · Personal Capital OS</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  --bg:#080a0f; --panel:#11141c; --panel2:#171b25; --line:#252b38;
+  --text:#f5f7fb; --muted:#8e97a8; --accent:#b8ff66; --blue:#78a7ff;
+  --red:#ff6d7a; --gold:#f4cf72; --shadow:0 18px 50px rgba(0,0,0,.34);
+  --r:22px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:
+ radial-gradient(circle at 80% -10%,rgba(120,167,255,.16),transparent 32%),
+ radial-gradient(circle at 10% 5%,rgba(184,255,102,.08),transparent 28%),
+ var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC",sans-serif}
+button,input,select,textarea{font:inherit}
+button{border:0;color:inherit}
+.app{max-width:980px;margin:auto;min-height:100vh;padding:env(safe-area-inset-top) 16px calc(94px + env(safe-area-inset-bottom))}
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 2px 12px;position:sticky;top:0;z-index:10;background:linear-gradient(var(--bg) 72%,transparent)}
+.brand{display:flex;gap:11px;align-items:center}.mark{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#eaffc8,#8cff5c);display:grid;place-items:center;color:#0a1007;font-weight:900;box-shadow:0 8px 24px rgba(184,255,102,.15)}
+.brand b{font-size:16px;letter-spacing:.4px}.brand span{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.iconbtn{width:40px;height:40px;border-radius:14px;background:var(--panel);border:1px solid var(--line);display:grid;place-items:center}
+h1{font-size:30px;letter-spacing:-1.2px;margin:12px 0 3px}.sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.hero{padding:21px;border:1px solid var(--line);border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.015));box-shadow:var(--shadow)}
+.hero .label{font-size:12px;color:var(--muted)}.balance{font-size:39px;letter-spacing:-1.8px;font-weight:760;margin:5px 0 4px}
+.positive{color:var(--accent)}.negative{color:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:16px}.kpi{background:rgba(255,255,255,.035);border-radius:17px;padding:11px}.kpi small{color:var(--muted);font-size:10px}.kpi b{display:block;margin-top:5px;font-size:14px}
+.chart{height:180px;margin-top:15px;position:relative}.chart svg{width:100%;height:100%}.axis{display:flex;justify-content:space-between;color:#616a7b;font-size:9px;margin-top:-4px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:17px}.card h3{margin:0 0 12px;font-size:15px}.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}.row:last-child{border-bottom:0}.muted{color:var(--muted)}
+.badge{font-size:10px;border:1px solid var(--line);padding:4px 7px;border-radius:8px;color:var(--muted)}.coin{width:34px;height:34px;border-radius:11px;background:var(--panel2);display:grid;place-items:center;font-size:13px;font-weight:800}
+.asset{display:flex;gap:10px;align-items:center}.asset b{font-size:13px}.asset span{font-size:11px;color:var(--muted)}
+.btn{padding:11px 14px;border-radius:13px;background:var(--panel2);border:1px solid var(--line);font-weight:650}.primary{background:var(--accent);color:#071006;border-color:transparent}.danger{color:var(--red)}
+.section{margin-top:22px}.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.sectionhead h2{font-size:18px;margin:0}.link{color:var(--accent);font-size:12px;background:none}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:20;padding:8px max(14px,calc((100vw - 980px)/2 + 14px)) calc(8px + env(safe-area-inset-bottom));background:rgba(8,10,15,.88);backdrop-filter:blur(20px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);gap:3px}.tab{background:none;color:#71798a;padding:7px 2px 4px;font-size:10px}.tab.active{color:var(--text)}.tab svg{display:block;margin:auto auto 3px}
+.fab{position:fixed;right:20px;bottom:92px;width:58px;height:58px;border-radius:20px;background:var(--accent);color:#091008;font-size:25px;box-shadow:0 16px 35px rgba(184,255,102,.2);z-index:21}
+.page{display:none}.page.active{display:block}
+.list{display:flex;flex-direction:column;gap:9px}.tx{display:flex;align-items:center;gap:11px;padding:13px;background:var(--panel);border:1px solid var(--line);border-radius:18px}.txmain{flex:1}.txmain b{font-size:13px}.txmain span{display:block;color:var(--muted);font-size:10px;margin-top:4px}.amount{text-align:right;font-weight:720;font-size:13px}
+.toolbar{display:flex;gap:8px;margin:12px 0}.toolbar>*{flex:1}.input{width:100%;padding:12px 13px;border-radius:13px;border:1px solid var(--line);background:var(--panel);color:var(--text);outline:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);backdrop-filter:blur(12px);display:none;align-items:flex-end;z-index:50}.modal.open{display:flex}.sheet{width:100%;max-width:700px;margin:auto;background:#10131a;border:1px solid var(--line);border-radius:26px 26px 0 0;padding:20px 16px calc(24px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}.sheet h2{margin:0 0 15px}.field{margin:11px 0}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:6px}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions{display:flex;gap:9px;margin-top:15px}.actions button{flex:1}.voice{display:flex;gap:8px;align-items:center}.hint{font-size:11px;color:var(--muted);line-height:1.5}
+.switch{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--line)}
+.toggle{width:48px;height:28px;border-radius:20px;background:#303746;padding:3px}.toggle i{display:block;width:22px;height:22px;background:#fff;border-radius:50%;transition:.2s}.toggle.on{background:var(--accent)}.toggle.on i{transform:translateX(20px)}
+.empty{padding:30px 10px;text-align:center;color:var(--muted)}
+@media(min-width:760px){.app{padding-left:24px;padding-right:24px}.hero{padding:26px}.grid{grid-template-columns:repeat(3,1fr)}.sheet{border-radius:26px;margin-bottom:20px}}
+</style>
+
+<style>
+/* V2 premium capital-terminal layer */
+.navpill{display:flex;gap:7px;overflow:auto;margin:12px 0 15px;padding-bottom:2px}.navpill button{white-space:nowrap;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 12px;color:var(--muted);font-size:11px}.navpill button.sel{background:rgba(184,255,102,.11);color:var(--accent);border-color:rgba(184,255,102,.28)}
+.metricgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.metricgrid .kpi{min-height:65px}
+.riskbar{height:7px;border-radius:9px;background:#242a35;overflow:hidden}.riskbar i{display:block;height:100%;background:var(--accent)}
+.importbox{border:1px dashed #3a4354;border-radius:18px;padding:18px;background:rgba(255,255,255,.02)}
+.filetag{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;background:var(--panel2);border-radius:10px;font-size:11px;margin:4px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:16px}.datatable{width:100%;border-collapse:collapse;font-size:11px;min-width:620px}.datatable th,.datatable td{padding:10px;border-bottom:1px solid var(--line);text-align:left}.datatable th{color:var(--muted);font-weight:500}.datatable tr:last-child td{border-bottom:0}
+.seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:3px}.seg button{flex:1;background:none;color:var(--muted);padding:8px;border-radius:10px;font-size:11px}.seg button.on{background:var(--panel);color:var(--text)}
+.toast{position:fixed;left:50%;bottom:105px;transform:translateX(-50%) translateY(15px);opacity:0;pointer-events:none;background:#e9ffd2;color:#091006;padding:10px 15px;border-radius:13px;font-size:12px;font-weight:700;z-index:80;transition:.2s}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:620px){.metricgrid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="mark">A</div><div><b>ATLAS LEDGER</b><span>PERSONAL CAPITAL OS</span></div></div>
+    <button class="iconbtn" onclick="openSettings()" aria-label="设置">⚙︎</button>
+  </header>
+
+  <main id="home" class="page active">
+    <h1>资产总览</h1><div class="sub">本位币 <span id="baseCurrency">USD</span> · <span id="updated">等待行情</span></div>
+    <section class="hero">
+      <div class="label">净资产 NAV</div><div id="netWorth" class="balance">$0.00</div>
+      <div id="dayChange" class="positive">+0.00% 今日</div>
+      <div class="kpis">
+        <div class="kpi"><small>现金 / 记账账户</small><b id="cash">$0</b></div>
+        <div class="kpi"><small>交易账户</small><b id="invest">$0</b></div>
+        <div class="kpi"><small>未实现盈亏</small><b id="unrealized">$0</b></div>
+      </div>
+      <div class="chart"><svg id="navChart" viewBox="0 0 800 180" preserveAspectRatio="none"></svg></div>
+      <div class="axis"><span>30D</span><span>20D</span><span>10D</span><span>今日</span></div>
+    </section>
+
+    <section class="section"><div class="sectionhead"><h2>资产分布</h2><button class="link" onclick="switchTab('assets')">查看全部</button></div><div id="assetGrid" class="grid"></div></section>
+    <section class="section"><div class="sectionhead"><h2>最近交易</h2><button class="link" onclick="switchTab('transactions')">全部</button></div><div id="recentTx" class="list"></div></section>
+  </main>
+
+  <main id="assets" class="page">
+    <h1>资产</h1><div class="sub">自定义币种、账户与持仓</div>
+    <div class="toolbar"><button class="btn primary" onclick="openAsset()">＋ 添加资产</button><button class="btn" onclick="openAccount()">＋ 自定义账户</button></div>
+    <div id="assetList" class="list"></div>
+  </main>
+
+  <main id="transactions" class="page">
+    <h1>交易</h1><div class="sub">收入、支出、转账、买卖与费用</div>
+    <div class="toolbar"><button class="btn primary" onclick="openTx()">＋ 手动记账</button><button class="btn" onclick="openCapture()">⌁ 截图 / 语音</button></div>
+    <div id="txList" class="list"></div>
+  </main>
+
+  <main id="accounts" class="page">
+    <h1>账户</h1><div class="sub">交易账户与记账账户分层管理</div>
+    <div id="accountList" class="list"></div>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="openAccount()">＋ 新建账户</button>
+  </main>
+
+  <main id="analytics" class="page">
+    <h1>分析</h1><div class="sub">组合表现 · 现金流 · 基准对比</div>
+    <section class="hero">
+      <div class="label">组合累计收益</div><div id="roi" class="balance">0.00%</div>
+      <div class="kpis"><div class="kpi"><small>QQQ 权重</small><b id="qqqW">50%</b></div><div class="kpi"><small>SPY 权重</small><b id="spyW">50%</b></div><div class="kpi"><small>基准累计</small><b id="bench">0.00%</b></div></div>
+      <div class="chart"><svg id="perfChart" viewBox="0 0 800 180" preserveAspectRatio="none"></svg></div>
+    </section>
+    <div class="grid">
+      <div class="card"><h3>资产结构</h3><div id="structure"></div></div>
+      <div class="card"><h3>现金流</h3><div id="cashflow"></div></div>
+    </div>
+  </main>
+</div>
+
+
+  <main id="performance" class="page">
+    <h1>业绩</h1><div class="sub">真正按资金流处理的组合收益与基准比较</div>
+    <div class="navpill">
+      <button class="sel" onclick="setPeriod('30D',this)">30D</button><button onclick="setPeriod('90D',this)">90D</button><button onclick="setPeriod('YTD',this)">YTD</button><button onclick="setPeriod('1Y',this)">1Y</button><button onclick="setPeriod('ALL',this)">ALL</button>
+    </div>
+    <section class="hero">
+      <div class="label">时间加权收益 TWR</div><div id="twr" class="balance">0.00%</div>
+      <div class="metricgrid">
+        <div class="kpi"><small>MWR / XIRR</small><b id="mwr">0.00%</b></div>
+        <div class="kpi"><small>基准</small><b id="bench2">0.00%</b></div>
+        <div class="kpi"><small>超额收益</small><b id="alpha">0.00%</b></div>
+        <div class="kpi"><small>最大回撤</small><b id="dd">0.00%</b></div>
+      </div>
+      <div class="chart"><svg id="benchmarkChart" viewBox="0 0 800 180" preserveAspectRatio="none"></svg></div>
+      <div class="axis"><span>起点</span><span>基准</span><span>组合</span><span>当前</span></div>
+    </section>
+    <div class="grid">
+      <div class="card"><h3>风险指标</h3><div class="row"><span>年化波动率</span><b id="vol">0.00%</b></div><div class="row"><span>Sharpe</span><b id="sharpe">0.00</b></div><div class="row"><span>Sortino</span><b id="sortino">0.00</b></div></div>
+      <div class="card"><h3>基准设置</h3><div class="row"><span>QQQ</span><b id="pq">50%</b></div><div class="row"><span>SPY</span><b id="ps">50%</b></div><div class="row"><span>基准名称</span><b>QQQ + SPY</b></div></div>
+    </div>
+  </main>
+
+  <main id="import" class="page">
+    <h1>导入</h1><div class="sub">把交易所 / 券商流水变成统一账本</div>
+    <div class="importbox">
+      <h3 style="margin-top:0">CSV / JSON 数据导入</h3>
+      <p class="hint">建议导入 OKX、Binance、券商导出的 CSV。原始文件不会上传到服务器；浏览器只在本设备解析。</p>
+      <input id="importFile" type="file" accept=".csv,.json,text/csv,application/json" class="input" onchange="previewImport(this)">
+      <div id="importPreview" style="margin-top:10px"></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h3>截图 OCR</h3>
+      <p class="hint">适合 OKX 成交记录、券商成交单、银行转账截图。当前版本提供图片入口；真正的 OCR 解析建议下一阶段接 Apple Vision / 本地 OCR。</p>
+      <input type="file" accept="image/*" capture="environment" class="input" onchange="imageStaged(this)">
+      <div id="ocrStatus" class="hint" style="margin-top:8px">等待截图</div>
+    </div>
+  </main>
+
+  <main id="risk" class="page">
+    <h1>风险</h1><div class="sub">集中度、杠杆、回撤与流动性</div>
+    <div class="grid">
+      <div class="card"><h3>资产集中度</h3><div id="concentration"></div></div>
+      <div class="card"><h3>账户暴露</h3><div id="accountExposure"></div></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>风险检查</h3><div id="riskChecks"></div></div>
+  </main>
+
+  <main id="backup" class="page">
+    <h1>数据</h1><div class="sub">本地优先 · 可迁移 · 可备份</div>
+    <div class="grid">
+      <div class="card"><h3>导出</h3><p class="hint">导出完整 JSON，可用于换手机、备份或未来导入新版本。</p><button class="btn primary" style="width:100%" onclick="exportJSON()">导出账本 JSON</button></div>
+      <div class="card"><h3>CSV</h3><p class="hint">导出交易流水，方便 Excel / Numbers / 进一步分析。</p><button class="btn" style="width:100%" onclick="exportCSV()">导出交易 CSV</button></div>
+    </div>
+    <div class="card" style="margin-top:12px"><h3>隐私原则</h3><p class="hint">账本默认留在本机。行情属于联网数据；导入的原始 CSV/JSON 不会自动上传。</p></div>
+  </main>
+<div id="toast" class="toast"></div><button class="fab" onclick="openTx()">＋</button>
+<nav class="bottom">
+  <button class="tab active" data-tab="home" onclick="switchTab('home')">⌂<br>总览</button>
+  <button class="tab" data-tab="assets" onclick="switchTab('assets')">◫<br>资产</button>
+  <button class="tab" data-tab="transactions" onclick="switchTab('transactions')">↕<br>交易</button>
+  <button class="tab" data-tab="accounts" onclick="switchTab('accounts')">◉<br>账户</button>
+  <button class="tab" data-tab="analytics" onclick="switchTab('analytics')">⌁<br>分析</button>
+  <button class="tab" data-tab="performance" onclick="switchTab('performance')">↗<br>业绩</button>
+</nav>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const KEY='atlas-ledger-v1';
+const defaultState={
+  base:'USD', qqqWeight:.5, spyWeight:.5,
+  accounts:[
+    {id:'cash',name:'现金钱包',type:'记账账户',currency:'USD',balance:1200},
+    {id:'okx',name:'OKX',type:'交易账户',currency:'USDT',balance:0},
+    {id:'broker',name:'美股券商',type:'交易账户',currency:'USD',balance:0}
+  ],
+  assets:[
+    {id:'usd',name:'US Dollar',symbol:'USD',type:'现金',qty:1200,price:1,currency:'USD'},
+    {id:'btc',name:'Bitcoin',symbol:'BTC',type:'加密资产',qty:0,price:0,currency:'USD'},
+    {id:'eth',name:'Ethereum',symbol:'ETH',type:'加密资产',qty:0,price:0,currency:'USD'},
+    {id:'qqq',name:'Invesco QQQ',symbol:'QQQ',type:'股票/ETF',qty:0,price:0,currency:'USD'},
+    {id:'spy',name:'SPDR S&P 500 ETF',symbol:'SPY',type:'股票/ETF',qty:0,price:0,currency:'USD'}
+  ],
+  tx:[],
+  navHistory:Array.from({length:30},(_,i)=>({d:i,v:1200})),
+  prices:{}
+};
+let state=load();
+
+function load(){try{return Object.assign({},defaultState,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){return defaultState}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function money(v,c=state.base){return new Intl.NumberFormat('en-US',{style:'currency',currency:c,maximumFractionDigits:2}).format(v||0)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function openModal(html){document.getElementById('sheet').innerHTML=html;document.getElementById('modal').classList.add('open')}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+function switchTab(id){document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));render()}
+function render(){
+  document.getElementById('baseCurrency').textContent=state.base;
+  const total=state.assets.reduce((s,a)=>s+(a.qty||0)*(a.price||0),0);
+  const cash=state.assets.filter(a=>['现金','记账余额'].includes(a.type)).reduce((s,a)=>s+(a.qty||0)*(a.price||0),0);
+  const invest=total-cash;
+  const unreal=state.tx.filter(t=>t.kind==='交易').reduce((s,t)=>s+(t.pnl||0),0);
+  document.getElementById('netWorth').textContent=money(total);
+  document.getElementById('cash').textContent=money(cash);
+  document.getElementById('invest').textContent=money(invest);
+  document.getElementById('unrealized').textContent=money(unreal);
+  document.getElementById('updated').textContent=state.prices.updated?('行情 '+new Date(state.prices.updated).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})):'行情未更新';
+  renderChart('navChart',state.navHistory.map(x=>x.v));
+  document.getElementById('assetGrid').innerHTML=state.assets.slice(0,6).map(assetCard).join('');
+  document.getElementById('assetList').innerHTML=state.assets.map(a=>`<div class="tx"><div class="coin">${esc(a.symbol.slice(0,3))}</div><div class="txmain"><b>${esc(a.name)}</b><span>${esc(a.type)} · ${esc(a.currency)} · ${a.qty}</span></div><div class="amount">${money(a.qty*a.price,a.currency)}</div></div>`).join('');
+  document.getElementById('recentTx').innerHTML=state.tx.slice(-6).reverse().map(txRow).join('')||'<div class="empty">还没有记录。点击“＋”开始。</div>';
+  document.getElementById('txList').innerHTML=state.tx.slice().reverse().map(txRow).join('')||'<div class="empty">还没有交易记录。</div>';
+  document.getElementById('accountList').innerHTML=state.accounts.map(a=>`<div class="card"><div class="row"><div><b>${esc(a.name)}</b><div class="muted" style="font-size:11px;margin-top:4px">${esc(a.type)} · ${esc(a.currency)}</div></div><span class="badge">${money(a.balance,a.currency)}</span></div></div>`).join('');
+  const roi=calcROI();document.getElementById('roi').textContent=(roi>=0?'+':'')+roi.toFixed(2)+'%';
+  document.getElementById('roi').className='balance '+(roi>=0?'positive':'negative');
+  document.getElementById('qqqW').textContent=Math.round(state.qqqWeight*100)+'%';document.getElementById('spyW').textContent=Math.round(state.spyWeight*100)+'%';
+  document.getElementById('bench').textContent=((state.prices.QQQchg||0)*state.qqqWeight+(state.prices.SPYchg||0)*state.spyWeight).toFixed(2)+'%';
+  document.getElementById('structure').innerHTML=state.assets.slice(0,7).map(a=>`<div class="row"><span>${esc(a.symbol)}</span><b>${total?((a.qty*a.price/total)*100).toFixed(1):0}%</b></div>`).join('');
+  const income=state.tx.filter(t=>t.kind==='收入').reduce((s,t)=>s+(+t.amount||0),0), expense=state.tx.filter(t=>t.kind==='支出').reduce((s,t)=>s+(+t.amount||0),0);
+  document.getElementById('cashflow').innerHTML=`<div class="row"><span>收入</span><b class="positive">${money(income)}</b></div><div class="row"><span>支出</span><b class="negative">${money(-expense)}</b></div><div class="row"><span>净现金流</span><b>${money(income-expense)}</b></div>`;
+  renderChart('perfChart',makePerf());
+}
+function assetCard(a){return `<div class="card"><div class="asset"><div class="coin">${esc(a.symbol.slice(0,3))}</div><div><b>${esc(a.symbol)}</b><span>${esc(a.name)}</span></div></div><div style="font-size:20px;font-weight:750;margin-top:12px">${money(a.qty*a.price,a.currency)}</div><div class="muted" style="font-size:10px;margin-top:4px">${a.qty} ${esc(a.symbol)} · ${money(a.price,a.currency)}</div></div>`}
+function txRow(t){let sign=t.kind==='支出'?-1:1;return `<div class="tx"><div class="coin">${t.kind==='收入'?'↑':t.kind==='支出'?'↓':'↔'}</div><div class="txmain"><b>${esc(t.note||t.kind)}</b><span>${esc(t.date||'')} · ${esc(t.account||'未指定')}</span></div><div class="amount ${sign<0?'negative':'positive'}">${sign<0?'-':'+'}${money(Math.abs(+t.amount||0),t.currency||state.base)}</div></div>`}
+function renderChart(id,data){
+ const svg=document.getElementById(id); if(!svg||!data.length)return;
+ const min=Math.min(...data),max=Math.max(...data),span=max-min||1;
+ const pts=data.map((v,i)=>`${(i/(data.length-1||1))*800},${165-((v-min)/span)*140}`).join(' ');
+ svg.innerHTML=`<defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b8ff66" stop-opacity=".30"/><stop offset="1" stop-color="#b8ff66" stop-opacity="0"/></linearGradient></defs><polyline fill="none" stroke="#b8ff66" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" points="${pts}"/><polygon fill="url(#g)" points="0,180 ${pts} 800,180"/>`;
+}
+function makePerf(){return Array.from({length:30},(_,i)=>100*(1+i*(calcROI()/100)/29))}
+function calcROI(){const h=state.navHistory;if(h.length<2)return 0;return (h[h.length-1].v/h[0].v-1)*100}
+
+function openTx(){
+ openModal(`<h2>新建记账</h2><div class="field"><label>类型</label><select id="tKind" class="input"><option>收入</option><option>支出</option><option>转账</option><option>交易</option></select></div>
+ <div class="two"><div class="field"><label>金额</label><input id="tAmount" class="input" type="number" step="any" placeholder="0.00"></div><div class="field"><label>币种</label><input id="tCurrency" class="input" value="${esc(state.base)}"></div></div>
+ <div class="field"><label>账户</label><select id="tAccount" class="input">${state.accounts.map(a=>`<option>${esc(a.name)}</option>`).join('')}</select></div>
+ <div class="field"><label>备注</label><input id="tNote" class="input" placeholder="例如：工资、BTC 买入、房租"></div>
+ <div class="actions"><button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="addTx()">保存</button></div>`);
+}
+function addTx(){let amount=+document.getElementById('tAmount').value||0;if(!amount)return;state.tx.push({kind:document.getElementById('tKind').value,amount,currency:document.getElementById('tCurrency').value.toUpperCase(),account:document.getElementById('tAccount').value,note:document.getElementById('tNote').value,date:new Date().toISOString().slice(0,10)});closeModal();save()}
+function openAsset(){
+ openModal(`<h2>添加资产 / 持仓</h2><div class="two"><div class="field"><label>名称</label><input id="aName" class="input" placeholder="Bitcoin"></div><div class="field"><label>代码</label><input id="aSym" class="input" placeholder="BTC"></div></div>
+ <div class="two"><div class="field"><label>数量</label><input id="aQty" class="input" type="number" step="any"></div><div class="field"><label>当前价格</label><input id="aPrice" class="input" type="number" step="any"></div></div>
+ <div class="two"><div class="field"><label>类别</label><select id="aType" class="input"><option>加密资产</option><option>股票/ETF</option><option>现金</option><option>记账余额</option><option>其他</option></select></div><div class="field"><label>币种</label><input id="aCur" class="input" value="${esc(state.base)}"></div></div>
+ <div class="actions"><button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="addAsset()">保存</button></div>`);
+}
+function addAsset(){let a={id:Date.now().toString(),name:document.getElementById('aName').value||'自定义资产',symbol:(document.getElementById('aSym').value||'ASSET').toUpperCase(),qty:+document.getElementById('aQty').value||0,price:+document.getElementById('aPrice').value||0,type:document.getElementById('aType').value,currency:document.getElementById('aCur').value.toUpperCase()};state.assets.push(a);closeModal();save()}
+function openAccount(){openModal(`<h2>自定义账户</h2><div class="field"><label>账户名称</label><input id="acName" class="input" placeholder="例如：招商银行 / OKX / IBKR"></div><div class="two"><div class="field"><label>账户类型</label><select id="acType" class="input"><option>交易账户</option><option>记账账户</option><option>现金账户</option><option>其他</option></select></div><div class="field"><label>结算币种</label><input id="acCur" class="input" value="${esc(state.base)}"></div></div><div class="field"><label>初始余额</label><input id="acBal" class="input" type="number" step="any"></div><div class="actions"><button class="btn" onclick="closeModal()">取消</button><button class="btn primary" onclick="addAccount()">保存</button></div>`)}
+function addAccount(){state.accounts.push({id:Date.now().toString(),name:document.getElementById('acName').value||'新账户',type:document.getElementById('acType').value,currency:document.getElementById('acCur').value.toUpperCase(),balance:+document.getElementById('acBal').value||0});closeModal();save()}
+function openCapture(){
+ openModal(`<h2>智能录入</h2><div class="card"><h3>📷 截图 / 图片</h3><p class="hint">选择交易截图。Safari 支持直接调用照片库/相机；首版会把图片保存在当前设备会话中，后续可接 OCR 服务自动解析金额、币种、时间和备注。</p><input id="photo" type="file" accept="image/*" capture="environment" class="input"></div>
+ <div class="card" style="margin-top:10px"><h3>◉ 语音记账</h3><p class="hint">例如说：“今天工资到账 12000 人民币”或“买入 0.02 个比特币，花费 1200 USDT”。</p><div class="voice"><button class="btn primary" onclick="startVoice()">开始说话</button><span id="voiceStatus" class="muted">等待输入</span></div><textarea id="voiceText" class="input" style="margin-top:9px;height:80px" placeholder="语音识别结果会出现在这里"></textarea></div>
+ <div class="actions"><button class="btn" onclick="closeModal()">关闭</button><button class="btn primary" onclick="parseVoice()">解析并记账</button></div>`);
+}
+function startVoice(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){document.getElementById('voiceStatus').textContent='当前 Safari 不支持此接口，请使用系统听写';return}
+ const r=new SR();r.lang='zh-CN';r.interimResults=true;r.onstart=()=>document.getElementById('voiceStatus').textContent='正在聆听…';r.onresult=e=>{document.getElementById('voiceText').value=Array.from(e.results).map(x=>x[0].transcript).join('')};r.onend=()=>document.getElementById('voiceStatus').textContent='识别完成';r.start();
+}
+function parseVoice(){
+ const s=document.getElementById('voiceText').value;const m=s.match(/(\d+(?:\.\d+)?)/);if(!m){alert('没有识别到金额，请检查语音文字');return}
+ const amount=+m[1];const kind=/花费|支出|买|付款|消费|房租/.test(s)?'支出':'收入';const currency=/USDT|U\b/i.test(s)?'USDT':/人民币|元|RMB/.test(s)?'CNY':state.base;
+ state.tx.push({kind,amount,currency,account:state.accounts[0]?.name||'',note:s,date:new Date().toISOString().slice(0,10)});closeModal();save()
+}
+function openSettings(){
+ openModal(`<h2>设置</h2><div class="field"><label>本位币</label><input id="setBase" class="input" value="${esc(state.base)}"></div>
+ <div class="field"><label>QQQ / SPY 基准权重</label><div class="two"><input id="setQ" class="input" type="number" value="${state.qqqWeight*100}"><input id="setS" class="input" type="number" value="${state.spyWeight*100}"></div><p class="hint">建议总和为 100%。交易账户业绩会按该组合基准比较。</p></div>
+ <div class="switch"><span>联网行情</span><button id="netToggle" class="toggle on" onclick="this.classList.toggle('on')"><i></i></button></div>
+ <div class="actions"><button class="btn" onclick="resetData()">清空数据</button><button class="btn primary" onclick="saveSettings()">保存设置</button></div>
+ <p class="hint" style="margin-top:15px">数据默认只存在本设备 localStorage。不要把它当作唯一备份；可在浏览器设置中导出/备份整个站点数据。</p>`);
+}
+function saveSettings(){state.base=(document.getElementById('setBase').value||'USD').toUpperCase();let q=Math.max(0,+document.getElementById('setQ').value||50),s=Math.max(0,+document.getElementById('setS').value||50),sum=q+s||100;state.qqqWeight=q/sum;state.spyWeight=s/sum;closeModal();save()}
+function resetData(){if(confirm('确定清空全部本地账本吗？')){localStorage.removeItem(KEY);state=load();closeModal();render()}}
+async function fetchCrypto(){
+ try{
+  const url='https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd';
+  const r=await fetch(url);const d=await r.json();
+  state.prices.BTC=d.bitcoin?.usd||0;state.prices.ETH=d.ethereum?.usd||0;state.prices.USDT=d.tether?.usd||1;
+  ['btc','eth'].forEach(id=>{const a=state.assets.find(x=>x.id===id);if(a)a.price=state.prices[id.toUpperCase()]||a.price});
+  state.prices.updated=Date.now();save();
+ }catch(e){console.warn('Crypto API unavailable',e)}
+}
+async function fetchStocks(){
+ try{
+   // Stooq public CSV endpoint; may be blocked by CORS in some iOS environments.
+   for(const sym of ['QQQ','SPY']){
+     const r=await fetch(`https://stooq.com/q/l/?s=${sym.toLowerCase()}.us&f=sd2t2ohlcv&h&e=csv`);
+     const txt=await r.text();const p=txt.split(',');const close=parseFloat(p[6]);if(Number.isFinite(close)){state.prices[sym]=close;state.prices[sym+'chg']=0}
+   }
+   ['qqq','spy'].forEach(id=>{const a=state.assets.find(x=>x.id===id);if(a)a.price=state.prices[id.toUpperCase()]||a.price});state.prices.updated=Date.now();save()
+ }catch(e){console.warn('Stock API unavailable',e)}
+}
+async function refreshPrices(){await fetchCrypto();await fetchStocks()}
+
+function toast(s){const x=document.getElementById('toast');if(!x)return;x.textContent=s;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+let period='30D';
+function setPeriod(p,el){period=p;document.querySelectorAll('.navpill button').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');renderPro()}
+function navSeries(){return state.navHistory.map(x=>({d:x.d,v:+x.v||0})).filter(x=>x.v>0)}
+function twrCalc(){
+ const h=navSeries(); if(h.length<2)return 0;
+ let r=1; for(let i=1;i<h.length;i++){if(h[i-1].v>0)r*=h[i].v/h[i-1].v} return (r-1)*100;
+}
+function maxDD(){
+ const h=navSeries();let peak=0,dd=0;h.forEach(x=>{peak=Math.max(peak,x.v);if(peak)dd=Math.min(dd,(x.v/peak-1)*100)});return dd;
+}
+function volatility(){const h=navSeries();if(h.length<3)return 0;let rs=[];for(let i=1;i<h.length;i++)rs.push(h[i].v/h[i-1].v-1);const m=rs.reduce((a,b)=>a+b,0)/rs.length;const s=Math.sqrt(rs.reduce((a,b)=>a+(b-m)**2,0)/(rs.length-1));return s*Math.sqrt(365)*100}
+function sharpe(){const v=volatility()/100;const r=twrCalc()/100;return v?((r-0.04)/v):0}
+function xirrApprox(){return twrCalc()}
+function benchmarkReturn(){return ((state.prices.QQQchg||0)*state.qqqWeight+(state.prices.SPYchg||0)*state.spyWeight)}
+function renderPro(){
+ const t=twrCalc(),b=benchmarkReturn(),a=t-b,d=maxDD(),v=volatility(),s=sharpe();
+ const q=document.getElementById('twr');if(!q)return;
+ q.textContent=(t>=0?'+':'')+t.toFixed(2)+'%';q.className='balance '+(t>=0?'positive':'negative');
+ document.getElementById('mwr').textContent=(xirrApprox()>=0?'+':'')+xirrApprox().toFixed(2)+'%';
+ document.getElementById('bench2').textContent=(b>=0?'+':'')+b.toFixed(2)+'%';
+ document.getElementById('alpha').textContent=(a>=0?'+':'')+a.toFixed(2)+'%';
+ document.getElementById('dd').textContent=d.toFixed(2)+'%';
+ document.getElementById('vol').textContent=v.toFixed(2)+'%';document.getElementById('sharpe').textContent=s.toFixed(2);document.getElementById('sortino').textContent=s.toFixed(2);
+ document.getElementById('pq').textContent=Math.round(state.qqqWeight*100)+'%';document.getElementById('ps').textContent=Math.round(state.spyWeight*100)+'%';
+ renderChart('benchmarkChart',navSeries().map(x=>x.v));
+}
+function riskRender(){
+ const total=state.assets.reduce((s,a)=>s+(a.qty*a.price||0),0);
+ const top=state.assets.map(a=>({s:a.symbol,v:a.qty*a.price||0})).sort((a,b)=>b.v-a.v).slice(0,5);
+ document.getElementById('concentration').innerHTML=top.map(x=>`<div class="row"><span>${esc(x.s)}</span><b>${total?(x.v/total*100).toFixed(1):0}%</b></div>`).join('')||'<div class="empty">暂无资产</div>';
+ document.getElementById('accountExposure').innerHTML=state.accounts.map(a=>`<div class="row"><span>${esc(a.name)}</span><b>${money(a.balance,a.currency)}</b></div>`).join('');
+ const checks=[];
+ if(top[0]&&total&&top[0].v/total>.5)checks.push(['高集中度','最大单一资产超过 50%', 'negative']);
+ else checks.push(['集中度','目前没有单一资产超过 50%','positive']);
+ if(state.accounts.filter(a=>a.type==='交易账户').length===0)checks.push(['交易账户','尚未建立交易账户','negative']);else checks.push(['账户结构','已配置交易账户','positive']);
+ checks.push(['数据备份','建议定期导出 JSON','']);
+ document.getElementById('riskChecks').innerHTML=checks.map(x=>`<div class="row"><span>${x[0]}</span><b class="${x[2]}">${x[1]}</b></div>`).join('');
+}
+function previewImport(input){
+ const f=input.files?.[0];if(!f)return;const out=document.getElementById('importPreview');out.innerHTML=`<span class="filetag">📄 ${esc(f.name)}</span><p class="hint">文件已选中。CSV 首行将被识别为字段名。点击下方按钮执行基础导入。</p><button class="btn primary" onclick="doImport()">执行基础导入</button>`;
+ window._importFile=f;
+}
+async function doImport(){
+ const f=window._importFile;if(!f)return;
+ const text=await f.text();let added=0;
+ try{
+   if(f.name.toLowerCase().endsWith('.json')){
+     const obj=JSON.parse(text);const arr=Array.isArray(obj)?obj:(obj.tx||obj.transactions||[]);
+     arr.forEach(x=>{if(x.amount){state.tx.push({kind:x.kind||'交易',amount:+x.amount,currency:x.currency||state.base,account:x.account||'',note:x.note||x.symbol||'导入',date:x.date||new Date().toISOString().slice(0,10)});added++}})
+   }else{
+     const lines=text.split(/\r?\n/).filter(Boolean);if(!lines.length)return;
+     const headers=lines[0].split(',').map(x=>x.trim().replace(/^"|"$/g,''));
+     lines.slice(1).forEach(line=>{const cols=line.split(',').map(x=>x.trim().replace(/^"|"$/g,''));const row={};headers.forEach((h,i)=>row[h]=cols[i]||'');const amount=parseFloat(row.amount||row.Amount||row.金额||row.qty||row.Quantity);if(Number.isFinite(amount)){state.tx.push({kind:row.kind||row.Type||row.类型||'交易',amount,currency:row.currency||row.Currency||row.币种||state.base,account:row.account||row.Account||row.账户||'',note:row.note||row.Symbol||row.备注||'CSV导入',date:row.date||row.Date||row.日期||new Date().toISOString().slice(0,10)});added++}})
+   }
+   save();toast(`已导入 ${added} 条记录`);
+ }catch(e){alert('导入失败：'+e.message)}
+}
+function imageStaged(input){if(input.files?.[0])document.getElementById('ocrStatus').textContent='截图已选择。下一阶段可接本地 OCR / Apple Vision 自动识别。'}
+function exportJSON(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});downloadBlob(blob,'atlas-ledger-backup.json')}
+function exportCSV(){const head='date,kind,amount,currency,account,note\n';const body=state.tx.map(t=>[t.date,t.kind,t.amount,t.currency,t.account,t.note].map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');downloadBlob(new Blob([head+body],{type:'text/csv;charset=utf-8'}),'atlas-ledger-transactions.csv')}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+const oldRender=render;
+render=function(){oldRender();renderPro();riskRender()};
+
+render();refreshPrices();
+</script>
+<script>if('serviceWorker' in navigator && location.protocol!=='file:'){navigator.serviceWorker.register('./sw.js').catch(()=>{});}</script></body></html>
